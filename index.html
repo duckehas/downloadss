@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Key Entry</title>
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width:100%; height:100%; overflow:hidden; font-family:Arial, sans-serif; }
+
+  body { background: radial-gradient(circle at top, #0b1c3d, #020712); }
+  canvas { position:fixed; inset:0; z-index:0; }
+
+  .center {
+    position:fixed; top:50%; left:50%;
+    transform:translate(-50%, -50%);
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .ui {
+    width:360px;
+    padding:16px 22px;
+    font-size:16px;
+    color:#e6f1ff;
+    border-radius:14px;
+    outline:none;
+    transition: all 0.25s ease;
+  }
+
+  /* Input styling + hover/focus */
+  .key-input {
+    background: rgba(20,40,80,0.35);
+    border:1px solid rgba(120,180,255,0.35);
+    backdrop-filter: blur(12px);
+  }
+
+  .key-input::placeholder { color: rgba(200,220,255,0.6); }
+
+  .key-input:focus {
+    box-shadow: 0 0 30px rgba(140,200,255,0.55);
+    transform: scale(1.02);
+  }
+
+  .check-btn {
+    border:none;
+    cursor:pointer;
+    font-weight:500;
+    text-align:center;
+    background: linear-gradient(135deg,#4aa3ff,#1f6edc);
+    box-shadow:0 8px 25px rgba(60,140,255,0.35);
+    color:white;
+    border-radius:14px;
+    transition: all 0.25s ease;
+  }
+
+  .check-btn:hover {
+    box-shadow:0 0 30px rgba(120,180,255,0.8);
+    transform: translateY(-1px);
+  }
+
+  .check-btn:active { transform: scale(0.97); }
+
+  .error {
+    animation: shake 0.35s;
+    box-shadow: 0 0 20px rgba(255,80,80,0.7)!important;
+  }
+
+  @keyframes shake {
+    0% {transform:translateX(0);} 25% {transform:translateX(-6px);}
+    50% {transform:translateX(6px);} 75% {transform:translateX(-6px);} 100% {transform:translateX(0);}
+  }
+
+  /* Popup styling */
+  .overlay {
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:5;
+  }
+
+  .popup {
+    width:420px;
+    padding:26px;
+    background:rgba(15,25,45,0.95);
+    border-radius:18px;
+    border:1px solid rgba(120,180,255,0.3);
+    text-align:center;
+    color:white;
+    box-shadow:0 0 40px rgba(120,180,255,0.4);
+    animation: pop 0.35s ease;
+  }
+
+  .popup h2 { color:#ffb347; margin-bottom:10px; }
+  .popup .link { font-size:13px; word-break:break-all; margin-bottom:14px; }
+
+  .continue-btn {
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background: linear-gradient(135deg,#4aa3ff,#1f6edc);
+    cursor:pointer;
+    color:white;
+    transition: all 0.25s ease;
+  }
+
+  .continue-btn:hover {
+    box-shadow: 0 0 35px rgba(120,180,255,0.9);
+    transform: translateY(-1px);
+  }
+
+  @keyframes pop { from{transform:scale(0.9);opacity:0;} to{transform:scale(1);opacity:1;} }
+</style>
+</head>
+
+<body>
+
+<canvas id="snow"></canvas>
+
+<div class="center">
+  <input id="keyInput" class="ui key-input" placeholder="Enter key here">
+  <button id="checkBtn" class="ui check-btn">Check Key</button>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="popup">
+    <h2>⚠️ Warning</h2>
+    <p>This site could be dangerous.</p>
+    <div class="link" id="linkText"></div>
+    <button class="continue-btn" id="continueBtn">Continue to Link</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- SNOW BACKGROUND ---------------- */
+const canvas = document.getElementById("snow");
+const ctx = canvas.getContext("2d");
+let w,h;
+function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+window.addEventListener("resize",resize); resize();
+
+const snow=[];
+for(let i=0;i<500;i++) snow.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*3+1,s:Math.random()*1.5+0.5});
+function snowAnim(){
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="rgba(200,220,255,0.8)";
+  snow.forEach(f=>{ f.y+=f.s; if(f.y>h)f.y=-5; ctx.beginPath(); ctx.arc(f.x,f.y,f.r,0,Math.PI*2); ctx.fill(); });
+  requestAnimationFrame(snowAnim);
+}
+snowAnim();
+
+/* ---------------- KEYS ---------------- */
+const KEYS = {
+  "Roblox Executor-ALPHA-9XQ2-KL8M-7TDP-92LX":"https://gofile.io/d/EF4RUi",
+  "Roblox Exesternal-1ZRM-W8K2-77PA":"https://gofile.io/d/fiYs3s",
+  "Fivem Exesternal-GAMMA-J9WQ-PLK8-3D0A-MX2R":"https://duckehas.github.io/Engine.com/FIvemexesternals.html",
+  "Cs2 Exesternal-DELTA-88QW-LM2Z-9XK1-T7AP":"https://gofile.io/d/xvu1ei",
+  "System Checker-ECHO-PL9X-0QW2-ZMK8-7DLA":"https://gofile.io/d/kg9eut",
+  "Mac/Arp/SystemCheckerspoofer-FALCON-7QZP-1KLM-XW92-8ADT":"https://gofile.io/d/2jxPo2",
+  "Fivem HWID SPOOFER-0PLX-92QW-K7ZM-D8RA":"https://gofile.io/d/Oi5j6s",
+  "Game Cleaner-HAWK-K9Z2-Q7PL-XWAM-81DT":"https://gofile.io/d/0d5OM8",
+  "Mac Spoofer-WOLF-7ZPL-QX92-WM8K-ADTR":"https://gofile.io/d/E2reg2",
+  "Arp Spoofer-FOX-Q92Z-KPL7-WXAM-18DT":"https://gofile.io/d/bQvX5W",
+  "Windows Activator-LYNX-PLX9-QW72-ZKMA-8TDR":"https://gofile.io/d/W5UVxH",
+  "Ida Pro-PL92-XQW7-ZKAM-18TD":"https://mega.nz/file/iYwGSLTK#qTdw9eHoI4X_8CijBbfRc2lGRGOPAxg28ipk2fMR0gk",
+  "WHITEOUT-QPL9-X7W2-ZKMA-AD18":"https://example.com/13"
+};
+
+let pending=null;
+checkBtn.onclick=()=>{
+  const k=keyInput.value.trim();
+  if(KEYS[k]){
+    pending=KEYS[k];
+    linkText.textContent=pending;
+    overlay.style.display="flex";
+  } else {
+    keyInput.classList.add("error");
+    setTimeout(()=>keyInput.classList.remove("error"),400);
+  }
+};
+
+continueBtn.onclick=()=>{ if(pending) location.href=pending; }
+
+/* ---------------- SITE SECURITY ---------------- */
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("keydown", e => {
+  if (
+    e.key === "F12" ||
+    (e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key)) ||
+    (e.ctrlKey && e.key === "U")
+  ) e.preventDefault();
+});
+setInterval(()=>{
+  if(window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160){
+    document.body.innerHTML="";
+  }
+},1000);
+</script>
+
+</body>
+</html>
